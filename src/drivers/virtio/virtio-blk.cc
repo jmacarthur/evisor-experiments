@@ -114,6 +114,7 @@ void VirtioBlk::DeviceInit() {
 void VirtioBlk::BlockDeviceInit() {
   virtq_ = reinterpret_cast<Virtq*>(evisor::kmm_uncached_malloc(
       __builtin_align_up(sizeof(Virtq), PAGE_SIZE)));
+  LOG_INFO("virtio: BlockDeviceInit()");
 
   // Initialize the index of the Virtqueue Used Ring.
   virtq_->used.index = 0;

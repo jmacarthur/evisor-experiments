@@ -84,6 +84,7 @@ void GicV2::RegisterIrq(uint16_t id,
   itargetsr_tmp &= ~((uint32_t)0xff << itargetsr_shift);
   itargetsr_tmp |= ((uint32_t)0x01 << target_processor) << itargetsr_shift;
   regs_.D->GICD_ITARGETSR[id / 4] = itargetsr_tmp;
+  LOG_TRACE("RegisterIrq id: 0x%x", id);
 }
 
 void GicV2::HandleIrq() {

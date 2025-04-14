@@ -53,7 +53,7 @@ uint32_t VirtioGic::Read(uint16_t addr) {
 }
 
 void VirtioGic::Write(uint32_t addr, uint32_t data) {
-  // LOG_TRACE("virtio_gic_write: addr = %04x, data = %04x", addr, data);
+  LOG_TRACE("virtio_gic_write: addr = %04x, data = %04x", addr, data);
   if (addr == 0x000) {
     regs_.GICD_CTLR = data;
   } else if (addr == 0x004) {
@@ -72,7 +72,7 @@ void VirtioGic::Write(uint32_t addr, uint32_t data) {
           // TODO if it's enabled, NuttX will not boot fine.
           // irq_register(id, 0, 0xca, virtio_gic_irq_callback);
         } else if (id == 33) {
-          // LOG_TRACE("URAT0 IRQ was enabled");
+          LOG_TRACE("URAT0 IRQ was enabled");
           // irq_register(id, 0, 0x7f, virtio_gic_irq_callback);
         } else {
           LOG_TRACE("TODO: id = %d", id);
