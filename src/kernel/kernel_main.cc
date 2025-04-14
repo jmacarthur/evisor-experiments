@@ -58,7 +58,7 @@ std::array<evisor::LoaderVcpuConfig, 1> kConfigVCPUs = {{
 #elif defined(TEST_GUEST_IS_NUTTX)
     {
         .filename = "nuttx.bin",
-        .file_load_va = 0x40280000,
+        .file_load_va = 0x40000000,
         .pc = 0x40280000,
         .sp = 0x41280000,
     },

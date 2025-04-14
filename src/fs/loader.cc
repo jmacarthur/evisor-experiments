@@ -23,10 +23,14 @@ bool LoaderLoadFile(Tcb* tsk, const char* name, uint64_t va) {
 #if defined(BOARD_IS_QEMU)
   auto& virtio = evisor::VirtioBlk::Get();
   virtio.Init();
-
-  int64_t sector_remains = virtio.GetDiskCapacity() / kDiskSectorSize;
+  int64_t load_length = virtio.GetDiskCapacity();
+  int64_t sector_remains = load_length / kDiskSectorSize;
   uint32_t sector_offset = 0;
   uint64_t cur = va & PAGE_MASK;
+
+  uint64_t checksum = 0;
+
+  LOG_INFO("LoaderLoadFile loading %s (for VA %x)", name, va);
 
   while (sector_remains > 0) {
     auto* buf = reinterpret_cast<uint8_t*>(PgTableStage1::PageMap(tsk, cur));
@@ -36,20 +40,22 @@ bool LoaderLoadFile(Tcb* tsk, const char* name, uint64_t va) {
         break;
       }
 
+      //LOG_INFO("LoaderLoadFile loading %s to %x (for VA %x)", name, buf, va);
       if (!virtio.ReadDisk(buf, sector_offset)) {
         LOG_ERROR("Failed to read. sector_offset: %d", sector_offset);
         return false;
       }
       sector_remains--;
       sector_offset++;
+      for(int j=0;j<kDiskSectorSize;j++) {
+	checksum += buf[j];
+      }
       buf += kDiskSectorSize;
     }
     cur += PAGE_SIZE;
   }
 
-  tsk->name = name;
-  LOG_INFO("Successfully loaded %s", tsk->name);
-
+  LOG_INFO("Checksum = %x", checksum);
   return true;
 #else
   Fat32Fs* fs = new Fat32Fs();
