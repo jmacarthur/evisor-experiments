@@ -157,9 +157,6 @@ bool VirtioBlk::ReadWriteDisk(void* buf, uint32_t sector_idx, bool is_write) {
     virtq_->blk_req->type = is_write ? kVirtioBlkTOut : kVirtioBlkTIn;
     virtq_->blk_req->reserved = 0;
     virtq_->blk_req->sector = sector_idx;
-    if (is_write) {
-      memcpy(virtq_->blk_req->data, buf, kDiskSectorSize);
-    }
 
     {
       auto blk_req_addr = reinterpret_cast<uint64_t>(virtq_->blk_req);
@@ -169,7 +166,7 @@ bool VirtioBlk::ReadWriteDisk(void* buf, uint32_t sector_idx, bool is_write) {
       virtq_->descs[0].flags = kVRingDescFNext;
       virtq_->descs[0].next = 1;
 
-      virtq_->descs[1].addr = blk_req_addr + offsetof(VirtioBlkReq, data);
+      virtq_->descs[1].addr = reinterpret_cast<uint64_t>(buf);
       virtq_->descs[1].len = kDiskSectorSize;
       if (is_write) {
         virtq_->descs[1].flags = 0;  // device reads the data
@@ -210,10 +207,6 @@ bool VirtioBlk::ReadWriteDisk(void* buf, uint32_t sector_idx, bool is_write) {
                 sector_idx, virtq_->blk_req->status);
       return false;
     }
-  }
-
-  if (!is_write) {
-    memcpy(buf, virtq_->blk_req->data, kDiskSectorSize);
   }
 
   return true;

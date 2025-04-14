@@ -65,7 +65,7 @@ class VirtioBlk {
     uint32_t type;
     uint32_t reserved;
     uint64_t sector;
-    uint8_t data[kDiskSectorSize];
+    uint8_t *data;
     uint8_t status;
   } __attribute__((packed));
 
